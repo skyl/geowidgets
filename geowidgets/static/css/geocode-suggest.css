@@ -1,0 +1,15 @@
+.geocode-suggest-results {
+  position: absolute;
+  z-index: 1;
+  background: white;
+}
+.geocode-suggest-result-selected {
+  background: yellow;
+}
+.geocode-suggest-map {
+  width: 300px;
+  height: 300px;
+}
+.geocode-suggest textarea {
+  display: none;
+}

@@ -1,5 +1,4 @@
 (function () {
-
 // shimz
 if (!document.getElementsByClassName) {
     document.getElementsByClassName=function(cn) {
@@ -24,17 +23,12 @@ function noMoveOnDownUp(e)
         e.preventDefault();
     }
 }
-
-
-
-
 google.maps.Map.prototype.clearMarkers = function() {
     for(var i=0; i < this.markers.length; i++){
         this.markers[i].setMap(null);
     }
     this.markers = new Array();
 };
-
 google.maps.Map.prototype.addMarker = function(location) {
   this.setCenter(location);
   var marker = new google.maps.Marker({
@@ -43,22 +37,20 @@ google.maps.Map.prototype.addMarker = function(location) {
   });
   this.markers.push(marker);
 };
-
-
+// end shimz
 
 
 var geocoder = new google.maps.Geocoder();
 
-
-
 function go() {
-
   geocode_suggest_divs = document.getElementsByClassName("geocode-suggest");
   //console.log(geocode_suggest_divs);
 
   // add input and map to each div
   for (var i = 0; i < geocode_suggest_divs.length; i++) {
-    var div = geocode_suggest_divs[i];
+    var div, id, input, results, map, gMap, latlng, mapOptions, textarea;
+    div = geocode_suggest_divs[i];
+    name = div.getAttribute("data-name");
 
     // input
     var input = document.createElement("input");
@@ -76,10 +68,10 @@ function go() {
     div.appendChild(results);
 
     // map
-    var map = document.createElement("div");
+    map = document.createElement("div");
     map.setAttribute("class", "geocode-suggest-map");
-    var latlng = new google.maps.LatLng(-34.397, 150.644);
-    var mapOptions = {
+    latlng = new google.maps.LatLng(-34.397, 150.644);
+    mapOptions = {
       zoom: 5,
       center: latlng
     }
@@ -87,6 +79,13 @@ function go() {
     gMap.markers = [];
     div.gMap = gMap;
     div.appendChild(map);
+
+    // how does django use id?
+    // textarea ?? -- Django ..
+    textarea = document.createElement("textarea");
+    textarea.setAttribute("name", name);
+    //textarea.setAttribute("style", "display: none;");
+    div.appendChild(textarea);
 
   }
 
@@ -159,14 +158,13 @@ function handleDown(ev) {
 }
 
 function handleEnter(ev) {
-  //console.log("enter");
+  var map, results_div, selected, loc, textarea;
   map = ev.target.parentNode.gMap;
   results_div = ev.target.nextSibling;
-
+  textarea = results_div.nextSibling.nextSibling;
   if (results_div.childNodes.length == 0) {
     return;
   }
-
   selected = results_div.getElementsByClassName("geocode-suggest-result-selected");
   if (selected.length > 0) {
     loc = selected[0].result.geometry.location;
@@ -174,8 +172,7 @@ function handleEnter(ev) {
     // None are selected, take the first one.
     loc = results_div.childNodes[0].result.geometry.location;
   }
-  map.clearMarkers();
-  map.addMarker(loc);
+  setLocation(loc, map, textarea);
   results_div.innerHTML = "";
 }
 
@@ -241,12 +238,19 @@ function inputKeyUp(ev) {
   });
 }
 
-function resOnClick(ev) {
-  // fragile
-  var loc = ev.target.result.geometry.location;
-  var map = ev.target.parentNode.parentNode.gMap;
+function setLocation(loc, map, textarea) {
   map.clearMarkers();
   map.addMarker(loc);
+  textarea.value = "POINT" + loc.toString();
+}
+
+function resOnClick(ev) {
+  var loc, map, textarea;
+  // fragile
+  loc = ev.target.result.geometry.location;
+  map = ev.target.parentNode.parentNode.gMap;
+  textarea = ev.target.parentNode.nextSibling.nextSibling;
+  setLocation(loc, map, textarea);
   ev.target.parentNode.innerHTML = "";
 }
 

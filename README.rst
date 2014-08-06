@@ -10,14 +10,13 @@ To add a geocoding point widget that asks Google to find the location for you:
 
 .. code-block:: python
 
-    from django.contrib.gis import forms
-
     from geowidgets.forms import GeocodeSuggestPointField
-
 
     class YourPersonForm(forms.Form):
 
         location = GeocodeSuggestPointField()
 
 
-This will give you a form that looks like `this <http://skyl.github.io/geowidgets/>`_ 
+This will give you a form that looks like `this <http://skyl.github.io/geowidgets/>`_.
+
+This is not yet on PyPi. But, you can checkout the repo and `setup.py install`.
